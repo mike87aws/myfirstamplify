@@ -1,0 +1,12 @@
+{
+    "permissions": {
+        "api": {
+            "cursoapp": [
+                "create",
+                "read",
+                "update",
+                "delete"
+            ]
+        }
+    }
+}

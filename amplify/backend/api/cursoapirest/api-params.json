@@ -1,0 +1,34 @@
+{
+    "paths": [
+        {
+            "name": "/stripe",
+            "lambdaFunction": "stripeWebhooks",
+            "privacy": {
+                "open": true
+            }
+        }
+    ],
+    "resourceName": "cursoapirest",
+    "apiName": "cursoapirest",
+    "functionArns": [
+        {
+            "lambdaFunction": "stripeWebhooks"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "amplify-cursoamplify-dev-212449-authRole",
+        "unAuthRoleName": "amplify-cursoamplify-dev-212449-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "stripeWebhooks",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}

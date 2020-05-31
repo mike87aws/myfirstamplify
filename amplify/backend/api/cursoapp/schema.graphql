@@ -1,0 +1,111 @@
+type S3Object {
+  name: String
+  size: Float
+  folder: String
+  bucket: String!
+  region: String!
+  key: String!
+  mime: String!
+}
+
+enum Category {
+  AWS
+  VUEJS
+  LARAVEL
+  NODEJS
+}
+
+enum CourseStatus {
+  DELETED
+  PENDING
+  ACTIVE
+}
+
+enum MembershipStatus {
+  PENDING
+  ACTIVE
+  CANCELLED
+}
+
+enum MembershipPeriod {
+  MONTHLY
+  YEARLY
+}
+
+type StripeMetadata {
+  stripeCheckoutSession: String
+  stripeSubscription: String
+  stripeCustomer: String
+}
+
+type User
+@model
+@key(name: "UserByEmail", fields: ["email", "createdAt"], queryField: "getUserByEmailSortByCreatedAt")
+@searchable
+{
+  id: ID!
+  email: String! #user email
+  avatar: String
+  membership: StudentMembership @connection(name: "UserMembership")
+  courses: [CourseUser] @connection(name: "UserCourses")
+  reviews: [Review] @connection(name: "UserReviews")
+  createdAt: AWSDateTime!
+}
+
+type StudentMembership
+@model
+@key(name: "membershipsByPlanStatusCreatedAt", fields: ["plan", "status", "createdAt"], queryField: "getMembershipsByPlanStatusCreatedAt")
+{
+  id: ID!
+  plan: String! #plan seleccionado (Pro - Full)
+  period: MembershipPeriod!
+  status: MembershipStatus!
+  stripeMetaData: StripeMetadata
+  user: User @connection(name: "UserMembership")
+  createdAt: AWSDateTime!
+  expiresAt: AWSDateTime
+}
+
+type Course @model
+@key(name: "coursesByCategoryStatusCreatedAt", fields: ["category", "status", "createdAt"], queryField: "getCoursesByCategoryStatusCreatedAt")
+@key(name: "coursesByStatusCreatedAt", fields: ["status", "createdAt"], queryField: "getCoursesByStatusCreatedAt")
+@searchable
+{
+  id: ID!
+  title: String!
+  description: String!
+  image: S3Object
+  category: String!
+  users: [CourseUser] @connection(name: "CourseUsers")
+  reviews: [Review] @connection(name: "CourseReviews")
+  status: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime
+  deletedAt: AWSDateTime
+}
+
+type CourseUser @model(queries: null) {
+  id: ID!
+  course: Course! @connection(name: "CourseUsers")
+  user: User! @connection(name: "UserCourses")
+}
+
+type Review @model
+@key(name: "reviewsByUser", fields: ["reviewUserId", "createdAt"], queryField: "getReviewsByUserSortByCreatedAt")
+@key(name: "reviewsByCourse", fields: ["reviewCourseId", "createdAt"], queryField: "getReviewsByCourseSortByCreatedAt")
+{
+  id: ID!
+  title: String!
+  course: Course @connection(name: "CourseReviews")
+  reviewCourseId: ID
+  user: User @connection(name: "UserReviews")
+  reviewUserId: ID
+  points: Int!
+  review: String!
+  createdAt: AWSDateTime!
+}
+
+type Mutation {
+  cancelMembership(id: ID): String @function(name: "cursoMembershipcancel-${env}")
+  resumeMembership(id: ID): String @function(name: "cursoMemberShipResume-${env}")
+}

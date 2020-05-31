@@ -1,0 +1,10 @@
+{
+    "permissions": {
+        "api": {
+            "cursoapp": [
+                "read",
+                "update"
+            ]
+        }
+    }
+}
